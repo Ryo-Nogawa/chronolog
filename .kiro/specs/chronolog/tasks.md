@@ -6,7 +6,7 @@
 
 ## タスク
 
-- [ ] 1. プロジェクトのセットアップと基本構造の作成
+- [x] 1. プロジェクトのセットアップと基本構造の作成
   - Spring Initializrを使用してプロジェクトを生成（Spring Boot 3.x、Java 17、Maven）
   - 必要な依存関係を追加（Web、JPA、H2、Thymeleaf、Security、jqwik）
   - パッケージ構造を作成（controller、service、repository、entity、config、exception）
