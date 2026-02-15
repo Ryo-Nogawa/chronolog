@@ -27,15 +27,15 @@
     - コンストラクタ、ゲッター、セッターを実装
     - _要件: 12.1, 13.2_
 
-- [ ] 3. リポジトリインターフェースの実装
-  - [ ] 3.1 AttendanceRepositoryインターフェースを作成
+- [x] 3. リポジトリインターフェースの実装
+  - [x] 3.1 AttendanceRepositoryインターフェースを作成
     - JpaRepositoryを継承
     - findByEmployeeIdOrderByWorkDateDescメソッドを定義
     - findByEmployeeIdAndWorkDateメソッドを定義
     - existsByEmployeeIdAndWorkDateメソッドを定義
     - _要件: 3.1, 5.1_
-  
-  - [ ] 3.2 UserRepositoryインターフェースを作成
+
+  - [x] 3.2 UserRepositoryインターフェースを作成
     - JpaRepositoryを継承
     - findByUsernameメソッドを定義
     - findByEmployeeIdメソッドを定義
