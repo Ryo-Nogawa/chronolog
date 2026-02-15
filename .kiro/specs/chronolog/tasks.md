@@ -13,14 +13,14 @@
   - application.propertiesにH2データベースとThymeleafの設定を追加
   - _要件: 6.1, 7.1, 7.2, 7.3_
 
-- [ ] 2. エンティティクラスの実装
-  - [ ] 2.1 AttendanceRecordエンティティを作成
+- [x] 2. エンティティクラスの実装
+  - [x] 2.1 AttendanceRecordエンティティを作成
     - @Entity、@Table、@Id、@GeneratedValue、@Columnアノテーションを使用
     - id、employeeId、workDate、clockInTime、clockOutTimeフィールドを定義
     - コンストラクタ、ゲッター、セッターを実装
     - _要件: 1.2, 2.2_
-  
-  - [ ] 2.2 Userエンティティを作成
+
+  - [x] 2.2 Userエンティティを作成
     - @Entity、@Table、@Id、@GeneratedValue、@Columnアノテーションを使用
     - id、username、password、employeeId、role、enabledフィールドを定義
     - usernameにUNIQUE制約を設定
