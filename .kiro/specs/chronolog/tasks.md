@@ -42,7 +42,7 @@
     - existsByUsernameメソッドを定義
     - _要件: 11.2, 12.3_
 
-- [ ] 4. カスタム例外クラスの実装
+- [x] 4. カスタム例外クラスの実装
   - DuplicateClockInException、NoClockInRecordException、DuplicateClockOutException、InvalidInputExceptionを作成
   - 各例外はRuntimeExceptionを継承
   - コンストラクタでメッセージを受け取る
