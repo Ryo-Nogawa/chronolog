@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.chronolog.entity.AttendanceRecord;
 import com.app.chronolog.exception.DuplicateClockInException;
+import com.app.chronolog.exception.DuplicateClockOutException;
 import com.app.chronolog.exception.NoClockInRecordException;
 import com.app.chronolog.repository.AttendanceRepository;
 
@@ -46,8 +47,12 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new NoClockInRecordException("従業員ID: " + employeeId + "は本日の出勤記録が作成されていません");
         }
 
-        // 退勤記録を作成
+        // 退勤記録の重複チェック
         AttendanceRecord createdClockInfo = clockInInfo.get();
+        if (createdClockInfo.getClockOutTime() != null) {
+            throw new DuplicateClockOutException("従業員ID: " + employeeId + "は本日既に退勤記録があります");
+        }
+
         createdClockInfo.setClockOutTime(LocalDateTime.now());
 
         return attendanceRepository.save(createdClockInfo);
