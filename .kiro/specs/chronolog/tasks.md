@@ -48,12 +48,12 @@
   - コンストラクタでメッセージを受け取る
   - _要件: 8.1_
 
-- [ ] 5. サービス層の実装
-  - [ ] 5.1 AttendanceServiceインターフェースを作成
+- [x] 5. サービス層の実装
+  - [x] 5.1 AttendanceServiceインターフェースを作成
     - clockIn、clockOut、getAttendanceHistory、calculateWorkingHoursメソッドを定義
     - _要件: 1.1, 2.1, 3.1, 4.1_
-  
-  - [ ] 5.2 AttendanceServiceImplクラスを実装
+
+  - [x] 5.2 AttendanceServiceImplクラスを実装
     - @Serviceアノテーションを付与
     - AttendanceRepositoryをコンストラクタインジェクション
     - clockInメソッドを実装（重複チェック、新規レコード作成）
