@@ -1,5 +1,6 @@
 package com.app.chronolog.service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,5 +64,18 @@ public class AttendanceServiceImpl implements AttendanceService {
     public List<AttendanceRecord> getAttendanceHistory(String employeeId) {
         // 勤怠履歴の取得
         return attendanceRepository.findByEmployeeIdOrderByWorkDateDesc(employeeId);
+    }
+
+    @Override
+    public Duration calculateWorkingHours(AttendanceRecord record) {
+        // 勤怠時間の計算
+        LocalDateTime clockInTime = record.getClockInTime();
+        LocalDateTime clockOutTime = record.getClockOutTime();
+
+        if (clockInTime == null || clockOutTime == null) {
+            throw new IllegalArgumentException("出勤または退勤どちらかの情報が記録されていません");
+        }
+
+        return Duration.between(clockInTime, clockOutTime);
     }
 }
