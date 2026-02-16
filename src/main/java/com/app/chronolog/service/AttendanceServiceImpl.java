@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.app.chronolog.entity.AttendanceRecord;
@@ -25,6 +26,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public AttendanceRecord clockIn(String employeeId) {
+        validationEmployeeId(employeeId);
         // 重複チェック
         LocalDate today = LocalDate.now();
         if (attendanceRepository.existsByEmployeeIdAndWorkDate(employeeId, today)) {
@@ -42,6 +44,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public AttendanceRecord clockOut(String employeeId) {
+        validationEmployeeId(employeeId);
         // 出勤記録チェック
         LocalDate today = LocalDate.now();
         Optional<AttendanceRecord> clockInInfo = attendanceRepository.findByEmployeeIdAndWorkDate(employeeId, today);
@@ -62,6 +65,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public List<AttendanceRecord> getAttendanceHistory(String employeeId) {
+        validationEmployeeId(employeeId);
         // 勤怠履歴の取得
         return attendanceRepository.findByEmployeeIdOrderByWorkDateDesc(employeeId);
     }
@@ -77,5 +81,12 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         return Duration.between(clockInTime, clockOutTime);
+    }
+
+    private boolean validationEmployeeId(String employeeId) {
+        if (StringUtils.isBlank(employeeId)) {
+            throw new IllegalArgumentException("従業員IDが設定されていません");
+        }
+        return true;
     }
 }
