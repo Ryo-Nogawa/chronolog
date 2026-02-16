@@ -87,6 +87,11 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (StringUtils.isBlank(employeeId)) {
             throw new IllegalArgumentException("従業員IDが設定されていません");
         }
+
+        if (employeeId.length() > 50) {
+            throw new IllegalArgumentException("従業員IDは50文字以内で設定してください");
+        }
+
         return true;
     }
 }
