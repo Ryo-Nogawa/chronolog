@@ -2,6 +2,7 @@ package com.app.chronolog.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -56,5 +57,11 @@ public class AttendanceServiceImpl implements AttendanceService {
         createdClockInfo.setClockOutTime(LocalDateTime.now());
 
         return attendanceRepository.save(createdClockInfo);
+    }
+
+    @Override
+    public List<AttendanceRecord> getAttendanceHistory(String employeeId) {
+        // 勤怠履歴の取得
+        return attendanceRepository.findByEmployeeIdOrderByWorkDateDesc(employeeId);
     }
 }
