@@ -7,6 +7,9 @@
 # Build
 target/
 
+# jqwik
+.jqwik-database
+
 # IDE
 .idea/
 *.iml
