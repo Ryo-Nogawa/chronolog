@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.mockito.Mockito;
 
@@ -58,5 +59,26 @@ public class AttendanceServicePropertyTest {
         assertThatThrownBy(() -> service.clockIn(employeeId))
                 .isInstanceOf(DuplicateClockInException.class)
                 .hasMessageContaining("既に出勤記録があります");
+    }
+
+    @Property
+    // Feature: attendance-management, Property 3: 退勤記録の更新
+    public void clockOutCreateCompleteRecord(@ForAll @AlphaChars @StringLength(min = 1, max = 10) String employeeId) {
+        // Given: 出勤を記録する
+        reset(repository);
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        AttendanceService service = new AttendanceServiceImpl(repository);
+        AttendanceRecord clockInRecord = service.clockIn(employeeId);
+
+        // When:退勤処理を実行
+        when(repository.findByEmployeeIdAndWorkDate(employeeId, LocalDate.now()))
+                .thenReturn(Optional.of(clockInRecord));
+        LocalDateTime beforeClockOut = LocalDateTime.now();
+        AttendanceRecord record = service.clockOut(employeeId);
+
+        // Then: レコードが完全であること
+        LocalDateTime afterClockOut = LocalDateTime.now();
+        assertThat(record.getClockOutTime()).isBetween(beforeClockOut, afterClockOut);
+
     }
 }
