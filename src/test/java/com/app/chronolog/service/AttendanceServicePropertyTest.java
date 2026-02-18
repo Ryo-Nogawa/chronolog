@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.mockito.Mockito;
@@ -117,5 +119,39 @@ public class AttendanceServicePropertyTest {
         assertThatThrownBy(() -> service.clockOut(employeeId))
                 .isInstanceOf(DuplicateClockOutException.class)
                 .hasMessageContaining("本日既に退勤記録があります");
+    }
+
+    @Property
+    // Feature: attendance-management, Property 6: 勤怠履歴の日付降順ソート
+    public void 勤怠履歴の日付降順ソート(@ForAll @AlphaChars @StringLength(min = 1, max = 10) String employeeId) {
+        // Given: ソート済みのレコードを作成
+        reset(repository);
+        List<AttendanceRecord> sortedRecords = createSortedRecords(employeeId, 3);
+        when(repository.findByEmployeeIdOrderByWorkDateDesc(employeeId))
+                .thenReturn(sortedRecords);
+        AttendanceService service = new AttendanceServiceImpl(repository);
+
+        // When: 履歴取得
+        List<AttendanceRecord> result = service.getAttendanceHistory(employeeId);
+
+        // Then: 日付が降順であることを検証
+        for (int i = 0; i < result.size() - 1; i++) {
+            assertThat(result.get(i).getWorkDate()).isAfterOrEqualTo(result.get(i + 1).getWorkDate());
+        }
+
+        // Then: 全レコードが指定した従業員のものであること
+        assertThat(result).allMatch(r -> r.getEmployeeId().equals(employeeId));
+    }
+
+    private List<AttendanceRecord> createSortedRecords(String employeeId, int count) {
+        List<AttendanceRecord> records = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            AttendanceRecord record = new AttendanceRecord();
+            record.setEmployeeId(employeeId);
+            record.setWorkDate(LocalDate.now().minusDays(i));
+            record.setClockInTime(LocalDate.now().minusDays(i).atTime(9, 0));
+            records.add(record);
+        }
+        return records;
     }
 }
