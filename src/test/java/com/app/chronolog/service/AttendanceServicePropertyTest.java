@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import com.app.chronolog.entity.AttendanceRecord;
 import com.app.chronolog.exception.DuplicateClockInException;
+import com.app.chronolog.exception.DuplicateClockOutException;
 import com.app.chronolog.exception.NoClockInRecordException;
 import com.app.chronolog.repository.AttendanceRepository;
 
@@ -94,5 +95,27 @@ public class AttendanceServicePropertyTest {
         assertThatThrownBy(() -> service.clockOut(employeeId))
                 .isInstanceOf(NoClockInRecordException.class)
                 .hasMessageContaining("本日の出勤記録が作成されていません");
+    }
+
+    @Property
+    // Feature: attendance-management, Property 5: 重複退勤の防止
+    public void 重複退勤の防止(@ForAll @AlphaChars @StringLength(min = 1, max = 10) String employeeId) {
+        // Given: 出勤記録の作成
+        reset(repository);
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        AttendanceService service = new AttendanceServiceImpl(repository);
+        AttendanceRecord clockInRecord = service.clockIn(employeeId);
+
+        // Given: 退勤記録の作成
+        when(repository.findByEmployeeIdAndWorkDate(employeeId, LocalDate.now()))
+                .thenReturn(Optional.of(clockInRecord));
+        AttendanceRecord clockOutRecord = service.clockOut(employeeId);
+
+        // When&Then: 退勤記録が重複している場合、例外をスロー
+        when(repository.findByEmployeeIdAndWorkDate(employeeId, LocalDate.now()))
+                .thenReturn(Optional.of(clockOutRecord));
+        assertThatThrownBy(() -> service.clockOut(employeeId))
+                .isInstanceOf(DuplicateClockOutException.class)
+                .hasMessageContaining("本日既に退勤記録があります");
     }
 }
