@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import com.app.chronolog.entity.AttendanceRecord;
 import com.app.chronolog.exception.DuplicateClockInException;
+import com.app.chronolog.exception.NoClockInRecordException;
 import com.app.chronolog.repository.AttendanceRepository;
 
 import net.jqwik.api.ForAll;
@@ -80,5 +81,18 @@ public class AttendanceServicePropertyTest {
         LocalDateTime afterClockOut = LocalDateTime.now();
         assertThat(record.getClockOutTime()).isBetween(beforeClockOut, afterClockOut);
 
+    }
+
+    @Property
+    // Feature: attendance-management, Property 4: 出勤記録なしでの退勤拒否
+    public void 出勤記録なしでの退勤拒否(@ForAll @AlphaChars @StringLength(min = 1, max = 10) String employeeId) {
+        // Given: リポジトリのクリア
+        reset(repository);
+        AttendanceService service = new AttendanceServiceImpl(repository);
+
+        // When&Then: 出勤記録がない場合は例外をスロー
+        assertThatThrownBy(() -> service.clockOut(employeeId))
+                .isInstanceOf(NoClockInRecordException.class)
+                .hasMessageContaining("本日の出勤記録が作成されていません");
     }
 }
