@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,8 +21,11 @@ import com.app.chronolog.exception.DuplicateClockOutException;
 import com.app.chronolog.exception.NoClockInRecordException;
 import com.app.chronolog.repository.AttendanceRepository;
 
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
 import net.jqwik.api.constraints.AlphaChars;
 import net.jqwik.api.constraints.StringLength;
 
@@ -141,6 +145,35 @@ public class AttendanceServicePropertyTest {
 
         // Then: 全レコードが指定した従業員のものであること
         assertThat(result).allMatch(r -> r.getEmployeeId().equals(employeeId));
+    }
+
+    @Property
+    // Feature: attendance-management, Property 8: 勤務時間の正確な計算
+    public void 勤務時間の正確な計算(@ForAll("clockInTimes") LocalDateTime clockInTime,
+            @ForAll("positiveMinutes") int minutesWorked) {
+        // Given: 出勤・退勤時刻の設定
+        AttendanceRecord record = new AttendanceRecord();
+        record.setClockInTime(clockInTime);
+        record.setClockOutTime(clockInTime.plusMinutes(minutesWorked));
+
+        AttendanceService service = new AttendanceServiceImpl(repository);
+        Duration result = service.calculateWorkingHours(record);
+
+        // Then: 出勤時間と退勤時間の計算
+        assertThat(result).isEqualTo(Duration.ofMinutes(minutesWorked));
+    }
+
+    @Provide
+    Arbitrary<LocalDateTime> clockInTimes() {
+        return Arbitraries.integers().between(2020, 2025).flatMap(year -> Arbitraries.integers().between(1, 12)
+                .flatMap(month -> Arbitraries.integers().between(1, 28)
+                        .flatMap(day -> Arbitraries.integers().between(0, 23).flatMap(hour -> Arbitraries.integers()
+                                .between(0, 59).map(minute -> LocalDateTime.of(year, month, day, hour, minute))))));
+    }
+
+    @Provide
+    Arbitrary<Integer> positiveMinutes() {
+        return Arbitraries.integers().between(1, 720);
     }
 
     private List<AttendanceRecord> createSortedRecords(String employeeId, int count) {
